@@ -11,17 +11,37 @@ public class Handgun : MonoBehaviour
     public float fireCharge = 10f;
     private float nextTimeToShoot = 0f;
 
+    [Header("Rifle Ammunition and reloading")]
+    private int maximumAmmunition = 25;
+    public int mag = 10;
+    public int presentAmmunition;
+    public float reloadingTime = 4.3f;
+    private bool setReloading = false;
+
+
     [Header("Rifle Effects")]
     public ParticleSystem muzzleSpark;
     public GameObject metallEffect;
 
+    [Header("Sounds && UI")]
+    public GameObject AmmoOutUI; 
     private void Awake()
     {
         Cursor.lockState = CursorLockMode.Locked;
+        presentAmmunition = maximumAmmunition;
     }
 
     void Update()
     {
+        if(setReloading)
+        {
+            return;
+        }
+        if (presentAmmunition <= 0)
+        {
+            StartCoroutine(Reload());
+            return;
+        }
         if (Input.GetButton("Fire1") && Time.time >=nextTimeToShoot)
         {
             nextTimeToShoot = Time.time+1f/fireCharge;
@@ -31,7 +51,17 @@ public class Handgun : MonoBehaviour
     }
     void Shoot()
     {
+        if (mag == 0)
+        {
+            StartCoroutine (ShowAmmoOut());
+            return;
+        }
+        presentAmmunition--;
+        if (presentAmmunition == 0)
+        {
+            mag--;
 
+        }
         muzzleSpark.Play();
         RaycastHit hitInfo;
 
@@ -50,5 +80,23 @@ public class Handgun : MonoBehaviour
             GameObject metalEffectGo =Instantiate(metallEffect, hitInfo.point, Quaternion.LookRotation(hitInfo.normal));
             Destroy(metalEffectGo,1f);
         }
+    }
+    
+    IEnumerator Reload()
+    {
+        setReloading = true;
+        Debug.Log("reloading...");
+        yield return new WaitForSeconds(reloadingTime);
+
+        Debug.Log("Done reloading");
+        presentAmmunition=maximumAmmunition;
+        setReloading = false;
+    }
+
+    IEnumerator ShowAmmoOut()
+    {
+        AmmoOutUI.SetActive(true);
+        yield return new WaitForSeconds(5f);
+        AmmoOutUI.SetActive(false);
     }
 }
