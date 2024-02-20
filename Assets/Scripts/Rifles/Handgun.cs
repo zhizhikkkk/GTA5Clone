@@ -8,6 +8,8 @@ public class Handgun : MonoBehaviour
     public Camera cam;
     public float giveDamage = 10f;
     public float shootingRange = 100f;
+    public float fireCharge = 10f;
+    private float nextTimeToShoot = 0f;
 
     [Header("Rifle Effects")]
     public ParticleSystem muzzleSpark;
@@ -20,8 +22,9 @@ public class Handgun : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetButtonDown("Fire1"))
+        if (Input.GetButton("Fire1") && Time.time >=nextTimeToShoot)
         {
+            nextTimeToShoot = Time.time+1f/fireCharge;
             Shoot();
         }
         
