@@ -9,6 +9,15 @@ public class Handgun : MonoBehaviour
     public float giveDamage = 10f;
     public float shootingRange = 100f;
 
+    [Header("Rifle Effects")]
+    public ParticleSystem muzzleSpark;
+    public GameObject metallEffect;
+
+    private void Awake()
+    {
+        Cursor.lockState = CursorLockMode.Locked;
+    }
+
     void Update()
     {
         if (Input.GetButtonDown("Fire1"))
@@ -19,6 +28,8 @@ public class Handgun : MonoBehaviour
     }
     void Shoot()
     {
+
+        muzzleSpark.Play();
         RaycastHit hitInfo;
 
         if (Physics.Raycast(cam.transform.position,cam.transform.forward,out hitInfo,shootingRange))
@@ -30,7 +41,11 @@ public class Handgun : MonoBehaviour
             if(obj!= null)
             {
                 obj.ObjectHitDamage(giveDamage);
+
+                
             }
+            GameObject metalEffectGo =Instantiate(metallEffect, hitInfo.point, Quaternion.LookRotation(hitInfo.normal));
+            Destroy(metalEffectGo,1f);
         }
     }
 }
